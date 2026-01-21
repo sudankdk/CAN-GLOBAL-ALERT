@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  # Redis Service
+  redis:
+    image: redis:7.0-alpine   # smaller, secure, lightweight image
+    container_name: redis-pubsub
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
+    command: ["redis-server", "--appendonly", "yes"]  # enable AOF persistence
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  redis_data:
+    driver: local

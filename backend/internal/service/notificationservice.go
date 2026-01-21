@@ -18,6 +18,12 @@ type NotificationServce struct {
 
 }
 
+func NewNotificationService() *NotificationServce {
+	return &NotificationServce{
+		clients: make(map[string]map[string]chan domain.Notification),
+	}
+}
+
 func (n *NotificationServce) Register(id, email string, channel chan domain.Notification) {
 	n.mu.Lock()
 	defer n.mu.Unlock()
@@ -61,7 +67,7 @@ func (n *NotificationServce) Broadcast(id string, message domain.Notification) e
 			}
 		}(emails, ch)
 	}
-	log.Panicf("broadcasting messages: %d", id)
+	log.Printf("broadcasting messages: %s", id)
 	return nil
 }
 

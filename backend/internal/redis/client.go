@@ -3,16 +3,16 @@ package my_redis
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/redis/go-redis/v9"
+	"github.com/sudankdk/cga/configs"
 )
 
 var RedisClient *redis.Client
 var Ctx = context.Background()
 
-func InitRedis() {
-	redisHost := os.Getenv("REDIS_HOST")
-	redisPort := os.Getenv("REDIS_PORT")
+func InitRedis(cfg configs.RedisConfig) {
+	redisHost := cfg.Host
+	redisPort := cfg.Port
 	RedisClient = redis.NewClient(&redis.Options{Addr: fmt.Sprintf("%s:%s", redisHost, redisPort)})
 }
