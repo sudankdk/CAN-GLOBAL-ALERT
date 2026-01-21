@@ -32,7 +32,7 @@ Cyber Alert Nepal requires a system that can notify users **immediately** when a
 
 ## 3. High-Level Architecture
 
-
+![alt text](image-1.png)
 
 ## 4. Design Descision 
 
