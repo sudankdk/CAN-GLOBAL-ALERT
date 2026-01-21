@@ -1,18 +1,33 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  # Redis Service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: golang_app
+    restart: unless-stopped
+    ports:
+      - "8080:8081"
+    depends_on:
+      - redis
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    networks:
+      - app-network
+
   redis:
-    image: redis:7.0-alpine   # smaller, secure, lightweight image
+    image: redis:7.0-alpine
     container_name: redis-pubsub
     restart: unless-stopped
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    command: ["redis-server", "--appendonly", "yes"]
     networks:
       - app-network
-    command: ["redis-server", "--appendonly", "yes"]  # enable AOF persistence
 
 networks:
   app-network:

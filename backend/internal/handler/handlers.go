@@ -1,10 +1,12 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 
 	"github.com/sudankdk/cga/internal/domain"
+	my_redis "github.com/sudankdk/cga/internal/redis"
 	"github.com/sudankdk/cga/internal/service"
 )
 
@@ -94,8 +96,21 @@ func (h *Handler) HandleBroadcastMessage(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	if err := h.services.Broadcast(notificationID, message); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	redisMsg := domain.RedisMessage{
+		NotificationId: notificationID,
+		EventType:      message.EventType,
+		Message:        message.Message,
+		Timestamp:      message.Timestamp,
+	}
+
+	data, err := json.Marshal(redisMsg)
+	if err != nil {
+		http.Error(w, "failed to marshal notification", http.StatusInternalServerError)
+		return
+	}
+
+	if err := my_redis.RedisClient.Publish(context.Background(), "notifications", data).Err(); err != nil {
+		http.Error(w, "failed to publish notification", http.StatusInternalServerError)
 		return
 	}
 

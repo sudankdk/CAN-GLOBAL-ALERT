@@ -38,6 +38,7 @@ func (n *NotificationServce) Remove(id, email string) {
 	defer n.mu.Unlock()
 	if client, ok := n.clients[id]; ok {
 		if channel, exist := client[email]; exist {
+			defer func() { recover() }() // Ignore panic if already closed
 			close(channel)
 			delete(client, email)
 		}
@@ -58,8 +59,8 @@ func (n *NotificationServce) Broadcast(id string, message domain.Notification) e
 	}
 	for emails, ch := range clients {
 		go func(email string, ch chan domain.Notification) {
+			defer func() { recover() }() // Ignore panic if channel closed
 			select {
-
 			case ch <- message:
 			default:
 				log.Printf("Removing client due to failed broadcast: notificationId=%s, subscriberEmail=%s", id, email)

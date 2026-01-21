@@ -14,10 +14,19 @@ import (
 func main() {
 	cfg := configs.Load()
 	my_redis.InitRedis(cfg.Redis)
+
+	// Add ping to verify Redis connection
+	pong, err := my_redis.RedisClient.Ping(my_redis.Ctx).Result()
+	if err != nil {
+		log.Fatalf("Redis ping failed: %v", err)
+	}
+	log.Printf("Redis connected: %s", pong)
+
 	notificationService := service.NewNotificationService()
+	go notificationService.SubToChannel("notifications")
 	handler := handler.NewHandler(*notificationService)
 
-	routers := router.NewRouter(handler) //expects handler
+	routers := router.NewRouter(handler)
 	server := &http.Server{
 		Addr:    ":" + cfg.Server.Port,
 		Handler: routers,
