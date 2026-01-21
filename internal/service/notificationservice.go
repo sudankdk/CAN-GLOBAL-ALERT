@@ -128,7 +128,11 @@ func (n *NotificationServce) SubToChannel(channel string) {
 		}
 		n.Broadcast(message.NotificationId, broadcastChanges)
 		if message.SubscriberEmail != "" {
-			userSpecificUpdate := domain.Notification{message.EventType, message.Message, message.Timestamp}
+			userSpecificUpdate := domain.Notification{
+				EventType: message.EventType,
+				Message:   message.Message,
+				Timestamp: message.Timestamp,
+			}
 			n.BroadcastToClients(message.NotificationId, message.SubscriberEmail, userSpecificUpdate)
 		}
 	}
