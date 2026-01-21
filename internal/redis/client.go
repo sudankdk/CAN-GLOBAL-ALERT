@@ -3,22 +3,16 @@ package my_redis
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/redis/go-redis/v9"
 )
 
-var ctx = context.Background()
+var RedisClient *redis.Client
+var Ctx = context.Background()
 
-func NewClient() *redis.Client {
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
-		DB:       0,
-	})
-
-	_, err := rdb.Ping(ctx).Result()
-	if err != nil {
-		panic(fmt.Sprintf("Failed to connect to Redis: %v", err))
-	}
-	return rdb
+func InitRedis() {
+	redisHost := os.Getenv("REDIS_HOST")
+	redisPort := os.Getenv("REDIS_PORT")
+	RedisClient = redis.NewClient(&redis.Options{Addr: fmt.Sprintf("%s:%s", redisHost, redisPort)})
 }
