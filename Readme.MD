@@ -150,6 +150,11 @@ Browser connection limits under HTTP/1.1 are mitigated in production using HTTP/
 - `GET /health` → Health check
 - `GET /notifications/live?id=<id>&email=<email>` → SSE stream
 - `POST /notifications/broadcast?id=<id>` → Send notification (JSON body)
+ example : `{
+    "eventType": "phishing",
+    "message": "Hello, world from 2!",
+    "timestamp": 1705843200
+  }`
 
 ---
 

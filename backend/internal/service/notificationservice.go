@@ -59,7 +59,7 @@ func (n *NotificationServce) Broadcast(id string, message domain.Notification) e
 	}
 	for emails, ch := range clients {
 		go func(email string, ch chan domain.Notification) {
-			defer func() { recover() }() // Ignore panic if channel closed
+			defer func() { recover() }()
 			select {
 			case ch <- message:
 			default:
