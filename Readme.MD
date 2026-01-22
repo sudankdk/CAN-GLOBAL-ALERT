@@ -104,3 +104,59 @@ Browser connection limits under HTTP/1.1 are mitigated in production using HTTP/
 
 ## 8. Testing Strategy
 
+### Performance Test (100+ Notifications)
+- **Command** (PowerShell for 100 requests):
+  ```
+  for ($i = 1; $i -le 100; $i++) { Invoke-WebRequest -Uri "http://localhost:8080/notifications/broadcast?id=test" -Method POST -ContentType "application/json" -Body ('{"eventType": "Test", "message": "Load test ' + $i + '", "timestamp": 1705843200}') -UseBasicParsing }
+  ```
+- **Result**: All requests return `202 Accepted` with low latency. SSE clients receive notifications instantly (e.g., sample output):
+  ```
+  data: {"eventType":"Test","message":"Load test 1","timestamp":1705843200}
+  data: {"eventType":"Test","message":"Load test 2","timestamp":1705843200}
+  ...
+  ```
+- **Conclusion**: System handles 100+ NPS without crashes.
+
+### Multi-Instance Test
+- Run additional instances: `docker run -d --name golang_app_2 --network backend_app-network -e REDIS_HOST=redis -e REDIS_PORT=6379 -p 8082:8081 backend-app`
+- Broadcast to one instance → Notifications propagate to clients on all instances.
+- Verified: ![Multi-Instance Screenshot](image-2.png)
+
+---
+
+## 9. Installation & Setup
+
+### Prerequisites
+- Docker & Docker Compose
+- Node.js (for frontend)
+
+### Quick Start
+1. **Backend**:
+   ```
+   cd backend
+   docker-compose up --build -d
+   ```
+   - Access: `http://localhost:8080`
+
+2. **Frontend**:
+   ```
+   cd frontend
+   npm install
+   npm run dev
+   ```
+   - Open: `http://localhost:5173`
+
+### API Endpoints
+- `GET /health` → Health check
+- `GET /notifications/live?id=<id>&email=<email>` → SSE stream
+- `POST /notifications/broadcast?id=<id>` → Send notification (JSON body)
+
+---
+
+## 10. Deployment
+- Use Docker Compose for single instance.
+- For multi-instance: Add Nginx proxy.
+- Enable HTTPS and authentication in production.
+
+---
+

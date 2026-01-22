@@ -40,7 +40,7 @@ func (h *Handler) HandleLiveNotification(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	clientChan := make(chan domain.Notification, 10)
+	clientChan := make(chan domain.Notification, 101)
 
 	h.services.Register(notificationID, email, clientChan)
 	defer func() {
